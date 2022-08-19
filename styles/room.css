@@ -178,6 +178,15 @@
   background-color: #3f434a;
   height: 60vh;
   display: none;
+  position: relative;
+}
+#stream__box .close-icon{
+  position:absolute;
+  top:10px;
+  left:10px;
+  z-index:2;
+  color: white;
+  cursor: pointer;
 }
 
 #stream__box .video__container{
@@ -304,7 +313,7 @@
   background-color: #1a1a1a60;
   padding: 1rem;
   left: 50%;
-  display: none;
+  display: flex;
   gap: 1rem;
   transform: translateX(-50%);
 }
