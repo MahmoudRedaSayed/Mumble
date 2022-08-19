@@ -30,3 +30,26 @@ chatButton.addEventListener('click', () => {
 
   activeChatContainer = !activeChatContainer;
 });
+
+// expend the user
+let boxFrame=document.getElementById("stream__box");
+let videos=document.getElementsByClassName("video__container");
+let userIdInDisplayFrame=null;
+let expend=(e)=>{
+  console.log("change")
+  let child=boxFrame.children[0];
+  if(child)
+  {
+    document.getElementById("streams__container").appendChild(child);
+  }
+  boxFrame.appendChild(e.currentTarget);
+  userIdInDisplayFrame=e.currentTarget.id;
+  boxFrame.style.display="block";
+}
+
+for(let i=0;i<videos.length;i++)
+{
+  videos[i].addEventListener("click",expend);
+}
+
+

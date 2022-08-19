@@ -173,52 +173,65 @@
   overflow-y: auto;
   height: 100%;
 }
+
 #stream__box{
-  background-color: white;
+  background-color: #3f434a;
   height: 60vh;
+  display: none;
 }
-.vidoes{
-  display:flex;
+
+#stream__box .video__container{
+  border: 2px solid #000;
+  border-radius: 0;
+  height: 100%!important;
+  width:100%!important;
+
+  background-size: 300px;
+}
+
+#stream__box video{
+  border-radius: 0;
+}
+
+#streams__container{
+  display: flex;
   flex-wrap: wrap;
   gap: 2em;
   justify-content: center;
   align-items: center;
+  margin-top: 25px;
+  margin-bottom: 225px;
 }
 
-.vidoes>div{
-  width: 300px;
-  height: 300px;
+.video__container{
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
-  cursor: pointer;
-  border-width: 5px;
-  border-style: solid;
-  border-color: #845695;
+  border:2px solid #b366f9;
   border-radius: 50%;
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  -ms-border-radius: 50%;
-  -o-border-radius: 50%;
+  cursor: pointer;
+  overflow: hidden;
+  height: 300px;
+  width: 300px;
+  background-image: url("../images/logo.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 75px;
 }
+
+.video-player{
+  height: 100%;
+  width: 100%;
+}
+
+.video-player video{
+  border-radius: 50%;
+}
+
 @media (max-width: 1400px) {
-  .vidoes>div{
-    width: 200px;
+  .video__container{
     height: 200px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    cursor: pointer;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #845695;
-    border-radius: 50%;
-    -webkit-border-radius: 50%;
-    -moz-border-radius: 50%;
-    -ms-border-radius: 50%;
-    -o-border-radius: 50%;
+    width: 200px;
   }
 }
 
@@ -256,6 +269,11 @@
     width: 100%;
   }
 
+  .video__container{
+    height: 100px;
+    width: 100px;
+  }
+
   #messages__container {
     display: none;
   }
@@ -286,7 +304,7 @@
   background-color: #1a1a1a60;
   padding: 1rem;
   left: 50%;
-  display: flex;
+  display: none;
   gap: 1rem;
   transform: translateX(-50%);
 }
@@ -317,4 +335,19 @@
 .stream__actions a:hover,
 .stream__actions button:hover {
   background-color: #845695;
+}
+
+#join-btn{
+  background-color: #845695;
+  font-size: 18px;
+  padding: 25px 50px;
+  border: none;
+  color:#fff;
+
+  position: fixed;
+  bottom: 1rem;
+  border-radius: 8px;
+  left:50%;
+  transform: translateX(-50%);
+  cursor: pointer;
 }
