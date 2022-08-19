@@ -5,6 +5,7 @@ let roomId;
 const querySearch=window.location.search;
 const Params=new URLSearchParams(querySearch);
 roomId=Params.get("room")
+let dispalyName;
 if(!uid)
 {
     uid=Math.floor(Math.random()*10000);
@@ -14,7 +15,18 @@ if(!roomId)
 {
     roomId="main"
 }
+if(sessionStorage.getItem("display_name")===null)
+{
+    window.location=`lobby.html`;
+}
+else
+{
+    dispalyName=sessionStorage.getItem("display_name");
+    console.log(dispalyName);
+}
 
+let rtmClient;
+let channel;
 let client;
 let localTracks=[];
 let screenTracks=[];
@@ -44,8 +56,12 @@ for(let i=0;i<videos.length;i++)
 
 
 ///////////////////////////////////////////////
-function joinRemoteRoom(){
-    
+async function joinRemoteRoom(){
+    rtmClient=await AgoraRTM.createInstance(APP_ID);
+    await rtmClient.login({uid,token});
+    channel=await rtmClient.createChannel(roomId);
+    await channel.join()
+    channel.on("MemberJoined",handleMemberJoin);
     client=AgoraRTC.createClient({"mode":"rtc","codec":"vp8"});
     client.on('user-published',handleUserPublish);
     client.on('user-left',handleUserleft);
@@ -163,7 +179,7 @@ let toggleScreen=async(e)=>{
                     <div class="video-player" id="user-${uid}"></div>
                 </div>`
     document.getElementById("streams__container").insertAdjacentHTML('afterBegin', player)
-  
+    document.getElementById(`user-container-${uid}`).addEventListener("click",expend);
       await localTracks[0].setMuted(true)
       await localTracks[1].setMuted(true)
   
