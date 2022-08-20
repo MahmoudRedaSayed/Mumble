@@ -1,6 +1,7 @@
 const APP_ID="c419b3be715d41dea6671362482e3db9";
 const token=null;
-let uid=localStorage.getItem("uid");
+// let uid=sessionStorage.getItem("uid");
+let uid=Math.floor(Math.random()*10000);
 let roomId;
 const querySearch=window.location.search;
 const Params=new URLSearchParams(querySearch);
@@ -9,21 +10,21 @@ let dispalyName;
 if(!uid)
 {
     uid=Math.floor(Math.random()*10000);
-    localStorage.setItem("uid",uid);
+    sessionStorage.setItem("uid",uid);
 }
 if(!roomId)
 {
     roomId="main"
 }
-if(sessionStorage.getItem("display_name")===null)
-{
-    window.location=`lobby.html`;
-}
-else
-{
-    dispalyName=sessionStorage.getItem("display_name");
-    console.log(dispalyName);
-}
+// if(sessionStorage.getItem("display_name")===null)
+// {
+//     window.location=`lobby.html`;
+// }
+// else
+// {
+//     dispalyName=sessionStorage.getItem("display_name");
+//     console.log(dispalyName);
+// }
 
 let rtmClient;
 let channel;
@@ -58,27 +59,29 @@ for(let i=0;i<videos.length;i++)
 ///////////////////////////////////////////////
 async function joinRemoteRoom(){
     rtmClient=await AgoraRTM.createInstance(APP_ID);
-    await rtmClient.login({uid,token});
-    channel=await rtmClient.createChannel(roomId);
-    await channel.join()
-    channel.on("MemberJoined",handleMemberJoin);
-    client=AgoraRTC.createClient({"mode":"rtc","codec":"vp8"});
-    client.on('user-published',handleUserPublish);
-    client.on('user-left',handleUserleft);
-    client.join(APP_ID,roomId,token,uid);
+    // await rtmClient.login({uid,token});
+    // channel=await rtmClient.createChannel(roomId);
+    // await channel.join()
+    // channel.on("MemberJoined",handleMemberJoin);
+    client = AgoraRTC.createClient({mode:'rtc', codec:'vp8'})
+    await client.join(APP_ID, roomId, token, uid)
+
+    client.on('user-published', handleUserPublished)
+    client.on('user-left', handleUserLeft)
     joinRoom();
 }
-let handleUserPublish=async(user,mediaType)=>{
+let handleUserPublished=async(user,mediaType)=>{
     remoteUsers[user.uid]=user;
     await client.subscribe(user, mediaType)
-    let player=document.getElementById(`user-container-${user.uid}`);
+    let player = document.getElementById(`user-container-${user.uid}`)
+    console.log("publish",player);
     if(player===null)
     {
-        player=`<div class="video__container"id="user-container-${uid}"  onclick="expend()"><div class="video-player" id="user_${uid}"></div>
+      console.log("from if",user.uid);
+        player=`<div class="video__container"id="user-container-${user.uid}"  onclick="expend()"><div class="video-player" id="user_${user.uid}"></div>
     </div>`
         document.getElementById("streams__container").insertAdjacentHTML("afterBegin",player);
         document.getElementById(`user-container-${user.uid}`).addEventListener("click",expend);
-
     }
     if(mediaType=="video")
     {
@@ -89,7 +92,7 @@ let handleUserPublish=async(user,mediaType)=>{
         user.aduioTrack.play();
     }
 }
-let handleUserleft=(user)=>{
+let handleUserLeft=(user)=>{
     delete remoteUsers[user.uid]
     let item = document.getElementById(`user-container-${user.uid}`)
     if(item){
