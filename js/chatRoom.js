@@ -17,7 +17,7 @@ if(!roomId)
 }
 if(sessionStorage.getItem("display_name")===null)
 {
-    window.location=`lobby.html`;
+    window.location=`index.html`;
 }
 else
 {
@@ -59,8 +59,8 @@ for(let i=0;i<videos.length;i++)
 async function joinRemoteRoom(){
     rtmClient=await AgoraRTM.createInstance(APP_ID);
     await rtmClient.login({uid,token});
-    await rtmClient.addOrUpdateLocalUserAttributes({"name":dispalyName});
     channel=await rtmClient.createChannel(roomId);
+    await rtmClient.addOrUpdateLocalUserAttributes({"name":dispalyName});
     await channel.join()
     addBotMessageToDom(`Welcome to the room ${dispalyName}! 👋`)
     // to add the first member in the channel 
@@ -121,6 +121,7 @@ let  joinRoom= async()=>{
     document.getElementById("streams__container").insertAdjacentHTML("afterBegin",player);
     document.getElementById(`user-container-${uid}`).addEventListener("click",expend);
     localTracks[1].play(`user_${uid}`);
+    await localTracks[0].play();
     await client.publish([localTracks[0], localTracks[1]])
 
 }
