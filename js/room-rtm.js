@@ -98,5 +98,20 @@ let leaveChannel = async () => {
     await channel.leave()
     await rtmClient.logout()
 }
-
+let sendMessage=async(e)=>{
+    e.preventDefault();
+    let text=e.target.message.value;
+    await channel.sendMessage({text:JSON.stringify({"text":text,"type":"chat","uid":uid,"dispalyName":dispalyName})})
+    addMessageToDom("Me",text);
+    e.target.reset();
+}
+let handleChannelMessage= async(messageData ,memberId)=>{
+    let data=JSON.parse(messageData.text) 
+    if(data.type==="chat")
+    addMessageToDom(data.dispalyName,data.text)
+    if(data.type==="user_left")
+    document.getElementById(`user-container-${data.uid}`).remove();
+}
 window.addEventListener('beforeunload', leaveChannel);
+let form=document.getElementById("message__form");
+form.addEventListener("submit",sendMessage);

@@ -62,25 +62,24 @@ async function joinRemoteRoom(){
     await rtmClient.addOrUpdateLocalUserAttributes({"name":dispalyName});
     channel=await rtmClient.createChannel(roomId);
     await channel.join()
+    addBotMessageToDom(`Welcome to the room ${dispalyName}! 👋`)
     // to add the first member in the channel 
     getMembers();
     channel.on("MemberJoined",handleMemberJoined);
     channel.on('MemberLeft',handleMemberLeft)
+    channel.on("ChannelMessage",handleChannelMessage);
     client = AgoraRTC.createClient({mode:'rtc', codec:'vp8'})
     await client.join(APP_ID, roomId, token, uid)
 
     client.on('user-published', handleUserPublished)
     client.on('user-left', handleUserLeft)
-    joinRoom();
 }
 let handleUserPublished=async(user,mediaType)=>{
     remoteUsers[user.uid]=user;
     await client.subscribe(user, mediaType)
     let player = document.getElementById(`user-container-${user.uid}`)
-    console.log("publish",player);
     if(player===null)
     {
-      console.log("from if",user.uid);
         player=`<div class="video__container"id="user-container-${user.uid}"  onclick="expend()"><div class="video-player" id="user_${user.uid}"></div>
     </div>`
         document.getElementById("streams__container").insertAdjacentHTML("afterBegin",player);
@@ -114,6 +113,8 @@ let handleUserLeft=(user)=>{
     }
 }
 let  joinRoom= async()=>{
+    document.getElementById('join-btn').style.display = 'none'
+    document.getElementsByClassName('stream__actions')[0].style.display = 'flex'
     localTracks=await AgoraRTC.createMicrophoneAndCameraTracks();
     let player=`<div class="video__container"id="user-container-${uid}"><div class="video-player" id="user_${uid}"></div>
     </div>`
@@ -203,8 +204,43 @@ let toggleScreen=async(e)=>{
     }
     boxFrame.style.display="none";
   }
+
+
+  let leaveStream = async (e) => {
+    e.preventDefault()
+
+    document.getElementById('join-btn').style.display = 'block'
+    document.getElementsByClassName('stream__actions')[0].style.display = 'none'
+
+    for(let i = 0; localTracks.length > i; i++){
+        localTracks[i].stop()
+        localTracks[i].close()
+    }
+
+    await client.unpublish([localTracks[0], localTracks[1]])
+
+    // if(screenTracks){
+        // await client.unpublish([screenTracks])
+    // }
+
+    document.getElementById(`user-container-${uid}`).remove()
+
+    if(userIdInDisplayFrame === `user-container-${uid}`){
+        displayFrame.style.display = null
+
+        for(let i = 0; videoFrames.length > i; i++){
+            videoFrames[i].style.height = '300px'
+            videoFrames[i].style.width = '300px'
+        }
+    }
+
+    channel.sendMessage({text:JSON.stringify({'type':'user_left', 'uid':uid})})
+}
+
   document.getElementById("close-icon").addEventListener("click",closeBoxStream);
   document.getElementById("camera-btn").addEventListener("click",toggleCamera);
   document.getElementById("mic-btn").addEventListener("click",toggleMic);
   document.getElementById("screen-btn").addEventListener("click",toggleScreen);
+  document.getElementById("join-btn").addEventListener("click",joinRoom)
+  document.getElementById('leave-btn').addEventListener('click', leaveStream)
 joinRemoteRoom();
