@@ -1,7 +1,6 @@
 const APP_ID="c419b3be715d41dea6671362482e3db9";
 const token=null;
-// let uid=sessionStorage.getItem("uid");
-let uid=Math.floor(Math.random()*10000);
+let uid=sessionStorage.getItem("uid");
 let roomId;
 const querySearch=window.location.search;
 const Params=new URLSearchParams(querySearch);
@@ -16,15 +15,15 @@ if(!roomId)
 {
     roomId="main"
 }
-// if(sessionStorage.getItem("display_name")===null)
-// {
-//     window.location=`lobby.html`;
-// }
-// else
-// {
-//     dispalyName=sessionStorage.getItem("display_name");
-//     console.log(dispalyName);
-// }
+if(sessionStorage.getItem("display_name")===null)
+{
+    window.location=`lobby.html`;
+}
+else
+{
+    dispalyName=sessionStorage.getItem("display_name");
+    console.log(dispalyName);
+}
 
 let rtmClient;
 let channel;
@@ -59,10 +58,14 @@ for(let i=0;i<videos.length;i++)
 ///////////////////////////////////////////////
 async function joinRemoteRoom(){
     rtmClient=await AgoraRTM.createInstance(APP_ID);
-    // await rtmClient.login({uid,token});
-    // channel=await rtmClient.createChannel(roomId);
-    // await channel.join()
-    // channel.on("MemberJoined",handleMemberJoin);
+    await rtmClient.login({uid,token});
+    await rtmClient.addOrUpdateLocalUserAttributes({"name":dispalyName});
+    channel=await rtmClient.createChannel(roomId);
+    await channel.join()
+    // to add the first member in the channel 
+    getMembers();
+    channel.on("MemberJoined",handleMemberJoined);
+    channel.on('MemberLeft',handleMemberLeft)
     client = AgoraRTC.createClient({mode:'rtc', codec:'vp8'})
     await client.join(APP_ID, roomId, token, uid)
 
